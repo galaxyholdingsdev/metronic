@@ -5,21 +5,10 @@ var KTDualListbox = function () {
     // Private functions
     var demo1 = function () {
         // Dual Listbox
-        var $this = $('#kt_dual_listbox_1');
-
-        // get options
-        var options = [];
-        $this.children('option').each(function () {
-            var value = $(this).val();
-            var label = $(this).text();
-            options.push({
-                text: label,
-                value: value
-            });
-        });
+        var _this = document.getElementById('kt_dual_listbox_1');
 
         // init dual listbox
-        var dualListBox = new DualListbox($this.get(0), {
+        var dualListBox = new DualListbox(_this, {
             addEvent: function (value) {
                 console.log(value);
             },
@@ -31,28 +20,16 @@ var KTDualListbox = function () {
             addButtonText: 'Add',
             removeButtonText: 'Remove',
             addAllButtonText: 'Add All',
-            removeAllButtonText: 'Remove All',
-            options: options,
+            removeAllButtonText: 'Remove All'
         });
     };
 
     var demo2 = function () {
         // Dual Listbox
-        var $this = $('#kt_dual_listbox_2');
-
-        // get options
-        var options = [];
-        $this.children('option').each(function () {
-            var value = $(this).val();
-            var label = $(this).text();
-            options.push({
-                text: label,
-                value: value
-            });
-        });
+        var _this = document.getElementById('kt_dual_listbox_2');
 
         // init dual listbox
-        var dualListBox = new DualListbox($this.get(0), {
+        var dualListBox = new DualListbox(_this, {
             addEvent: function (value) {
                 console.log(value);
             },
@@ -64,28 +41,16 @@ var KTDualListbox = function () {
             addButtonText: "<i class='flaticon2-next'></i>",
             removeButtonText: "<i class='flaticon2-back'></i>",
             addAllButtonText: "<i class='flaticon2-fast-next'></i>",
-            removeAllButtonText: "<i class='flaticon2-fast-back'></i>",
-            options: options,
+            removeAllButtonText: "<i class='flaticon2-fast-back'></i>"
         });
     };
 
     var demo3 = function () {
         // Dual Listbox
-        var $this = $('#kt_dual_listbox_3');
-
-        // get options
-        var options = [];
-        $this.children('option').each(function () {
-            var value = $(this).val();
-            var label = $(this).text();
-            options.push({
-                text: label,
-                value: value
-            });
-        });
+        var _this = document.getElementById('kt_dual_listbox_3');
 
         // init dual listbox
-        var dualListBox = new DualListbox($this.get(0), {
+        var dualListBox = new DualListbox(_this, {
             addEvent: function (value) {
                 console.log(value);
             },
@@ -97,28 +62,16 @@ var KTDualListbox = function () {
             addButtonText: 'Add',
             removeButtonText: 'Remove',
             addAllButtonText: 'Add All',
-            removeAllButtonText: 'Remove All',
-            options: options,
+            removeAllButtonText: 'Remove All'
         });
     };
 
     var demo4 = function () {
         // Dual Listbox
-        var $this = $('#kt_dual_listbox_4');
-
-        // get options
-        var options = [];
-        $this.children('option').each(function () {
-            var value = $(this).val();
-            var label = $(this).text();
-            options.push({
-                text: label,
-                value: value
-            });
-        });
+        var _this = document.getElementById('kt_dual_listbox_4');
 
         // init dual listbox
-        var dualListBox = new DualListbox($this.get(0), {
+        var dualListBox = new DualListbox(_this, {
             addEvent: function (value) {
                 console.log(value);
             },
@@ -130,8 +83,7 @@ var KTDualListbox = function () {
             addButtonText: 'Add',
             removeButtonText: 'Remove',
             addAllButtonText: 'Add All',
-            removeAllButtonText: 'Remove All',
-            options: options,
+            removeAllButtonText: 'Remove All'
         });
 
         // hide search
@@ -149,6 +101,6 @@ var KTDualListbox = function () {
     };
 }();
 
-jQuery(document).ready(function () {
+window.addEventListener('load', function(){
     KTDualListbox.init();
 });

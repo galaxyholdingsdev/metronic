@@ -208,6 +208,14 @@ var KTDefaultDatatableDemo = function() {
 
 	};
 
+	$('#kt_datatable_reload').on('click', function() {
+		$('#kt_datatable').KTDatatable('reload');
+	});
+
+	$('#kt_datatable_clear').on('click', function() {
+		$('#kt_datatable_console').val('');
+	});
+
 	var eventsCapture = function() {
 		$('#kt_datatable').on('datatable-on-init', function() {
 			eventsWriter('Datatable init');
@@ -233,7 +241,10 @@ var KTDefaultDatatableDemo = function() {
 	};
 
 	var eventsWriter = function(string) {
-		var console = $('#kt_datatable_console').append(string + '\t\n');
+		var console = $('#kt_datatable_console');
+		var value = console.val();
+		value = value + '\t\n' + string;
+		$(console).val(value);
 		$(console).scrollTop(console[0].scrollHeight - $(console).height());
 	};
 

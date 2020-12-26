@@ -77,6 +77,7 @@ var KTDatatableRemoteAjaxDemo = function() {
             }, {
                 field: 'Status',
                 title: 'Status',
+	              autoHide: false,
                 // callback function support for column rendering
                 template: function(row) {
                     var status = {

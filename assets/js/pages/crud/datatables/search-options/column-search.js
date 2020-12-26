@@ -274,6 +274,7 @@ var KTDatatablesSearchOptionsColumnSearch = function() {
                 },
                 {
                     targets: 6,
+                    width: '100px',
                     render: function(data, type, full, meta) {
                         var status = {
                             1: {
@@ -313,6 +314,7 @@ var KTDatatablesSearchOptionsColumnSearch = function() {
                 },
                 {
                     targets: 7,
+                    width: '100px',
                     render: function(data, type, full, meta) {
                         var status = {
                             1: {

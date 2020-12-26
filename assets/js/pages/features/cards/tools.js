@@ -191,31 +191,6 @@ var KTCardTools = function () {
                 KTApp.unblock(card.getSelf());
             }, 2000);
         });
-
-        // Reload event handlers
-        card.on('afterFullscreenOn', function(card) {
-            toastr.warning('After fullscreen on event fired!');
-            var scrollable = $(card.getBody()).find('> .kt-scroll');
-
-            if (scrollable) {
-                scrollable.data('original-height', scrollable.css('height'));
-                scrollable.css('height', '100%');
-
-                KTUtil.scrollUpdate(scrollable[0]);
-            }
-        });
-
-        card.on('afterFullscreenOff', function(card) {
-            toastr.warning('After fullscreen off event fired!');
-            var scrollable = $(card.getBody()).find('> .kt-scroll');
-
-            if (scrollable) {
-                var scrollable = $(card.getBody()).find('> .kt-scroll');
-                scrollable.css('height', scrollable.data('original-height'));
-
-                KTUtil.scrollUpdate(scrollable[0]);
-            }
-        });
     }
 
     // Demo 4
@@ -276,31 +251,6 @@ var KTCardTools = function () {
             setTimeout(function() {
                 KTApp.unblock(card.getSelf());
             }, 2000);
-        });
-
-        // Reload event handlers
-        card.on('afterFullscreenOn', function(card) {
-            toastr.warning('After fullscreen on event fired!');
-            var scrollable = $(card.getBody()).find('> .kt-scroll');
-
-            if (scrollable) {
-                scrollable.data('original-height', scrollable.css('height'));
-                scrollable.css('height', '100%');
-
-                KTUtil.scrollUpdate(scrollable[0]);
-            }
-        });
-
-        card.on('afterFullscreenOff', function(card) {
-            toastr.warning('After fullscreen off event fired!');
-            var scrollable = $(card.getBody()).find('> .kt-scroll');
-
-            if (scrollable) {
-                var scrollable = $(card.getBody()).find('> .kt-scroll');
-                scrollable.css('height', scrollable.data('original-height'));
-
-                KTUtil.scrollUpdate(scrollable[0]);
-            }
         });
     }
 

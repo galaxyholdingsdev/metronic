@@ -1862,6 +1862,7 @@ var KTMenu = function(elementId, options) {
                 } else {
                     KTUtil.slideUp(submenu, speed, function() {
                         Plugin.scrollToItem(item);
+                        Plugin.scrollUpdate();
                         Plugin.eventTrigger('submenuToggle', submenu, e);
                     });
 
@@ -3474,25 +3475,26 @@ var KTUtil = function() {
             return window.Zone !== undefined ? true : false;
         },
 
-        // jQuery Workarounds
-
         // Deep extend:  $.extend(true, {}, objA, objB);
         deepExtend: function(out) {
             out = out || {};
 
             for (var i = 1; i < arguments.length; i++) {
                 var obj = arguments[i];
-
-                if (!obj)
-                    continue;
+                if (!obj) continue;
 
                 for (var key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        if (typeof obj[key] === 'object')
-                            out[key] = KTUtil.deepExtend(out[key], obj[key]);
-                        else
-                            out[key] = obj[key];
+                    if (!obj.hasOwnProperty(key)) {
+                        continue;
                     }
+
+                    // based on https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
+                    if ( Object.prototype.toString.call(obj[key]) === '[object Object]' ) {
+                        out[key] = KTUtil.deepExtend(out[key], obj[key]);
+                        continue;
+                    }
+
+                    out[key] = obj[key];
                 }
             }
 
@@ -6449,8 +6451,8 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 					|| options.data.serverFiltering === false && action === 'search'
 				) {
 					setTimeout(function() {
-						afterGetData();
 						Plugin.setAutoColumns();
+						afterGetData();
 					});
 					return;
 				}
@@ -7396,7 +7398,13 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 					$(datatable.table).find('.' + pfx + 'datatable-cell').show();
 					$(datatable.tableBody).each(function() {
 						var recursive = 0;
-						while ($(this)[0].offsetWidth < $(this)[0].scrollWidth && recursive < options.columns.length) {
+						var offsetWidth = $(this)[0].offsetWidth;
+						var scrollWidth = $(this)[0].scrollWidth;
+
+						while (offsetWidth < scrollWidth && (scrollWidth - offsetWidth) > Plugin.cellOffset && recursive < options.columns.length) {
+							offsetWidth = $(this)[0].offsetWidth;
+							scrollWidth = $(this)[0].scrollWidth;
+
 							$(datatable.table).find('.' + pfx + 'datatable-row').each(function(i) {
 								var cell = $(this).find('.' + pfx + 'datatable-cell:not(:hidden):not([data-autohide-disabled])').last();
 									if (cell.length) {
@@ -8881,8 +8889,8 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 							Extension.unselectedRows = Extension.remove(Extension.unselectedRows, id);
 						});
 						var storage = {};
-						storage['selectedRows'] = $.unique(Extension.selectedRows);
-						storage['unselectedRows'] = $.unique(Extension.unselectedRows);
+						storage['selectedRows'] = Extension.selectedRows.filter(Extension.unique);
+						storage['unselectedRows'] = Extension.unselectedRows.filter(Extension.unique);
 						datatable.stateKeep('checkbox', storage);
 					});
 					$(datatable).on(pfx + 'datatable-on-uncheck', function(e, ids) {
@@ -8892,8 +8900,9 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 							Extension.selectedRows = Extension.remove(Extension.selectedRows, id);
 						});
 						var storage = {};
-						storage['selectedRows'] = $.unique(Extension.selectedRows);
-						storage['unselectedRows'] = $.unique(Extension.unselectedRows);
+						storage['selectedRows'] = Extension.selectedRows.filter(Extension.unique);
+						storage['unselectedRows'] = Extension.unselectedRows.filter(Extension.unique);
+						storage['unselectedRows'] = Extension.unselectedRows.filter(Extension.unique);
 						datatable.stateKeep('checkbox', storage);
 					});
 				}
@@ -8920,7 +8929,7 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 							}));
 						}
 						var storage = {};
-						storage['selectedRows'] = $.unique(Extension.selectedRows);
+						storage['selectedRows'] = Extension.selectedRows.filter(Extension.unique);
 						datatable.stateKeep('checkbox', storage);
 					}
 
@@ -9030,11 +9039,11 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 							selectedAllRows = Extension.remove(selectedAllRows, parseInt(id));
 						});
 					}
-					return $.unique(selectedAllRows);
+					return selectedAllRows.filter(Extension.unique);
 				}
 
 				// else return single checked selected rows
-				return Extension.selectedRows;
+				return Extension.selectedRows.filter(Extension.unique);
 			},
 
 			remove: function(array, element) {
@@ -9167,7 +9176,7 @@ KTUtil.ready(function() {
 
     // Init Code Highlighter & Preview Blocks(used to demonstrate the theme features)
     if (typeof KTLayoutExamples !== 'undefined') {
-        KTLayoutExamples.init('kt_page_stretched_card');
+        KTLayoutExamples.init();
     }
 
     // Init Demo Selection Panel
@@ -10028,89 +10037,98 @@ var KTLayoutExamples = function() {
             elements = document.querySelectorAll('.example:not(.example-compact):not(.example-hover):not(.example-basic)');
         }
 
-        for (var i = 0; i < elements.length; ++i) {
-            var example = elements[i];
-            var copy = KTUtil.find(example, '.example-copy');
+        if (elements && elements.length > 0 ) {
+            for (var i = 0; i < elements.length; ++i) {
+                var example = elements[i];
+                var copy = KTUtil.find(example, '.example-copy');
 
-            var clipboard = new ClipboardJS(copy, {
-                target: function(trigger) {
-                    var example = trigger.closest('.example');
-                    var el = KTUtil.find(example, '.example-code .tab-pane.active');
+                if (copy) {
+                    var clipboard = new ClipboardJS(copy, {
+                        target: function(trigger) {
+                            var example = trigger.closest('.example');
+                            var el = KTUtil.find(example, '.example-code .tab-pane.active');
 
-                    if (!el) {
-                        el = KTUtil.find(example, '.example-code');
-                    }
+                            if (!el) {
+                                el = KTUtil.find(example, '.example-code');
+                            }
 
-                    return el;
+                            return el;
+                        }
+                    });
+
+                    clipboard.on('success', function(e) {
+                        KTUtil.addClass(e.trigger, 'example-copied');
+                        e.clearSelection();
+
+                        setTimeout(function() {
+                            KTUtil.removeClass(e.trigger, 'example-copied');
+                        }, 2000);
+                    });
                 }
-            });
-
-            clipboard.on('success', function(e) {
-                KTUtil.addClass(e.trigger, 'example-copied');
-                e.clearSelection();
-
-                setTimeout(function() {
-                    KTUtil.removeClass(e.trigger, 'example-copied');
-                }, 2000);
-            });
+            }
         }
     }
 
     var initCompactMode = function(element) {
         var example,code,toggle,copy, clipboard;
+
         var elements = element;
         if (typeof elements === 'undefined') {
             var elements = document.querySelectorAll('.example.example-compact');
         }
 
-        for (var i = 0; i < elements.length; ++i) {
-            var example = elements[i];
-            var toggle = KTUtil.find(example, '.example-toggle');
-            var copy = KTUtil.find(example, '.example-copy');
+        if (elements && elements.length > 0 ) {
+            for (var i = 0; i < elements.length; ++i) {
+                var example = elements[i];
+                var toggle = KTUtil.find(example, '.example-toggle');
+                var copy = KTUtil.find(example, '.example-copy');
 
-            // Handle toggle
-            KTUtil.addEvent(toggle, 'click', function() {
-                var example = this.closest('.example');
-                var code =  KTUtil.find(example, '.example-code');
-                var the = this;
+                // Handle toggle
+                KTUtil.addEvent(toggle, 'click', function() {
+                    var example = this.closest('.example');
+                    var code =  KTUtil.find(example, '.example-code');
+                    var the = this;
 
-                if (KTUtil.hasClass(this, 'example-toggled')) {
-                    KTUtil.slideUp(code, 300, function() {
-                        KTUtil.removeClass(the, 'example-toggled');
-                        KTUtil.removeClass(code, 'example-code-on');
-                        KTUtil.hide(code);
-                    });
-                } else {
-                    KTUtil.addClass(code, 'example-code-on');
-                    KTUtil.addClass(this, 'example-toggled');
-                    KTUtil.slideDown(code, 300, function() {
-                        KTUtil.show(code);
-                    });
-                }
-            });
-
-            // Handle copy
-            var clipboard = new ClipboardJS(copy, {
-                target: function(trigger) {
-                    var example = trigger.closest('.example');
-                    var el = KTUtil.find(example, '.example-code .tab-pane.active');
-
-                    if (!el) {
-                        el = KTUtil.find(example, '.example-code');
+                    if (KTUtil.hasClass(this, 'example-toggled')) {
+                        KTUtil.slideUp(code, 300, function() {
+                            KTUtil.removeClass(the, 'example-toggled');
+                            KTUtil.removeClass(code, 'example-code-on');
+                            KTUtil.hide(code);
+                        });
+                    } else {
+                        KTUtil.addClass(code, 'example-code-on');
+                        KTUtil.addClass(this, 'example-toggled');
+                        KTUtil.slideDown(code, 300, function() {
+                            KTUtil.show(code);
+                        });
                     }
+                });
 
-                    return el;
+                // Handle copy
+                if (copy) {
+                    var clipboard = new ClipboardJS(copy, {
+                        target: function(trigger) {
+                            var example = trigger.closest('.example');
+                            var el = KTUtil.find(example, '.example-code .tab-pane.active');
+
+                            if (!el) {
+                                el = KTUtil.find(example, '.example-code');
+                            }
+
+                            return el;
+                        }
+                    });
+
+                    clipboard.on('success', function(e) {
+                        KTUtil.addClass(e.trigger, 'example-copied');
+                        e.clearSelection();
+
+                        setTimeout(function() {
+                            KTUtil.removeClass(e.trigger, 'example-copied');
+                        }, 2000);
+                    });
                 }
-            });
-
-            clipboard.on('success', function(e) {
-                KTUtil.addClass(e.trigger, 'example-copied');
-                e.clearSelection();
-
-                setTimeout(function() {
-                    KTUtil.removeClass(e.trigger, 'example-copied');
-                }, 2000);
-            });
+            }
         }
     }
 

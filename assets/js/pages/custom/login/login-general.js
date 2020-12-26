@@ -27,32 +27,32 @@ var KTLogin = function () {
             validation.validate().then(function (status) {
                 if (status === "Valid") {
                     KTUtil.btnWait(btn, "spinner spinner-right spinner-white pr-15", "Please wait");
-					fetch(form.action,
-						{
-							method: form.method,
-							body: new FormData(form)
-						})
-						.then(response => response.json())
-						.then(response =>
-						{
-							KTUtil.btnRelease(btn);
-							if (response.status === "success") {
-								_showMessage(response.message, "success", "Continue");
-								if (response.redirectUri) {
-									window.location.assign(response.redirectUri);
-								}
-							}
-							else {
-								_showMessage(response.message, "error", "Try again");
-							}
-							console.log('Success:', response);
-						})
-						.catch(error =>
-						{
-							KTUtil.btnRelease(btn);
-							_showMessage(response.message, "error", "Try again");
-							console.error('Error:', error);
-						});
+                    fetch(form.action,
+                        {
+                            method: form.method,
+                            body: new FormData(form)
+                        })
+                        .then(response => response.json())
+                        .then(response =>
+                        {
+                            KTUtil.btnRelease(btn);
+                            if (response.status === "success") {
+                                _showMessage(response.message, "success", "Continue");
+                                if (response.redirectUri) {
+                                    window.location.assign(response.redirectUri);
+                                }
+                            }
+                            else {
+                                _showMessage(response.message, "error", "Try again");
+                            }
+                            console.log('Success:', response);
+                        })
+                        .catch(error =>
+                        {
+                            KTUtil.btnRelease(btn);
+                            _showMessage(response.message, "error", "Try again");
+                            console.error('Error:', error);
+                        });
                 }
                 else {
                     _showMessage("Some errors were detected. Please check and try again", "error", "Ok, got it!");
